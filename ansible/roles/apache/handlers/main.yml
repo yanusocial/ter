@@ -1,0 +1,13 @@
+#- hosts: LAMP
+#  name: handlers
+#  remote_user: centos
+
+#  tasks:  
+
+#  handlers:
+    - name: restart httpd service
+      service:
+        name: httpd
+        state: restarted
+#      listen: "restart services"
+#      become: true

@@ -1,0 +1,48 @@
+#- hosts: LAMP
+#  name: Install and configure the database
+#  remote_user: centos
+
+#  tasks:
+
+  - name: Include vars of vars.yaml
+    include_vars:
+      file: ../../../vars/vars.yml
+
+  - name: Copying the root credentials as .my.cnf file
+    template: src=../files/my.cnf dest=~/.my.cnf owner=root group=root mode=0600
+#    become: true
+
+  - name: Set MariaDB root password
+    mysql_user:
+      name: root
+      password: "{{ mysql_root_password }}"
+      check_implicit_admin: yes
+#    become: true
+
+  - name: mysql_sercure_installation
+    command: 'mysql -ne "{{ item }}"'
+    with_items:
+      - DELETE FROM mysql.user WHERE User='' #remove anonymous users
+      - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1') #disallow root login remotely
+      - DROP DATABASE IF EXISTS test #Remove test database and access to it
+      - DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%' #Remove test database and access to it
+      - FLUSH PRIVILEGES #Reload privilege tables
+    changed_when: False
+#    become: true
+
+  - name: Creating a new database with name 'wp_db'
+    mysql_db:
+      name: "{{ wp_db }}"
+      state: present
+      login_user: root
+      login_password: "{{ mysql_root_password }}"
+#    become: true
+
+  - name: Creating database user
+    mysql_user:
+      name: "{{ wp_user }}"
+      password: "{{ wp_user_password }}"
+      priv: '{{ wp_db }}.*:ALL,GRANT'
+      state: present
+    notify:
+      - restart mariadb service

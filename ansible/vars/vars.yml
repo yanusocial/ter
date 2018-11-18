@@ -1,0 +1,15 @@
+### set your domain here ###
+yourdomain: wp.jlhinojal.com
+
+### set your wordpress DB name ###
+wp_db: wp_db
+
+### set your wordpress DB User name ###
+wp_user: wp_user
+
+### set your DB root password ###
+mysql_root_password: StrongPassword
+
+### set your wordpress DB password ###
+wp_user_password: StrongPassword
+

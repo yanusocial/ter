@@ -1,0 +1,13 @@
+#- hosts: LAMP
+#  name: handlers
+#  remote_user: centos
+
+#  tasks:  
+
+#  handlers:
+    - name: restart mariadb service
+      service:
+        name: mariadb
+        state: restarted
+#      listen: "restart services"
+#      become: true

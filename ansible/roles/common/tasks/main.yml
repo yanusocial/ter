@@ -1,0 +1,79 @@
+#- hosts: LAMP
+#  remote_user: centos
+
+#  tasks:
+  - name: update all packages
+    yum:
+      name: '*'
+      state: latest
+#    become: true
+
+  - name: Add epel repository
+    yum_repository:
+      name: epel
+      description: EPEL YUM repo
+      baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+      enabled: 1
+      gpgcheck: no
+#    become: true
+
+  - name: Add repository webtatic-release
+    yum_repository:
+      name: webtatic
+      description: webtatic repo
+      baseurl: https://repo.webtatic.com/yum/el7/$basearch/
+      mirrorlist: https://mirror.webtatic.com/yum/el7/$basearch/mirrorlist
+      enabled: 1
+      gpgcheck: no
+#    become: true
+
+  - name: Install packages
+    yum:
+      name: "{{ packages }}"
+      state: latest
+    vars:
+      packages:
+      - httpd
+      - mariadb-server
+      - mod_php72w
+      - php72w-opcache
+      - php72w-mysqlnd
+      - MySQL-python
+      - mod_ssl
+#    become: true
+
+  - name: yum-clean-metadata
+    command: yum clean metadata
+    args:
+      warn: no
+#    become: true
+
+  - name: ensure apache is running (and enable it at boot)
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+#    become: true
+
+  - name: ensure mariadb is running (and enable it at boot)
+    service:
+      name: mariadb
+      state: started
+      enabled: yes
+#    become: true
+
+   #SELinux configuration
+  - selinux:
+      policy: targeted
+      state: enforcing
+#    become: true
+  - sefcontext:
+      target: '/var/www/html(/.*)?'
+      setype: httpd_sys_content_t
+      state: present
+#    become: true
+  - sefcontext:
+      target: '/var/lib/mysql(/.*)?'
+      setype: mysqld_db_t
+      state: present
+#    become: true

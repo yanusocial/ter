@@ -1,0 +1,16 @@
+---
+- hosts: LAMP
+  become: true
+  user: centos
+  roles:
+    - common
+    - apache
+    - db
+    - wordpress
+
+#- import_playbook: roles/common/tasks/main.yml
+#- import_playbook: roles/apache/tasks/main.yml
+#- import_playbook: roles/db/tasks/main.yml
+#- import_playbook: roles/wordpress/tasks/main.yml
+#- import_playbook: roles/apache/handlers/main.yml
+#- import_playbook: roles/db/handlers/main.yml

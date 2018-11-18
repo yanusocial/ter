@@ -1,0 +1,62 @@
+#- hosts: LAMP
+#  name: Install and configure apache
+#  remote_user: centos
+
+#  tasks:
+
+  - name: Include vars of vars.yaml
+    include_vars:
+      file: ../../../vars/vars.yml
+
+  - name: copying httpd.conf
+    copy:
+      src: ../files/httpd.conf
+      dest: /etc/httpd/conf/httpd.conf
+      owner: root
+      group: root
+      mode: 0644
+      backup: yes
+#    become: true
+
+  - name: copying ssl.conf
+    copy:
+      src: ../files/ssl.conf
+      dest: /etc/httpd/conf.d/ssl.conf
+      owner: root
+      group: root
+      mode: 0644
+      backup: yes
+#    become: true
+
+  - name: copying virtualhost.conf
+    copy:
+      src: ../files/virtualhost.conf
+      dest: /etc/httpd/conf.d/virtualhost.conf
+      owner: root
+      group: root
+      mode: 0644
+#    become: true
+
+  - name: creating virtualhost directory
+    file:
+      path: /var/www/html/wordpress
+      state: directory
+      owner: apache
+      group: apache
+      mode: 0775
+#    become: true
+
+  - name: Update virtualhost.conf with your domain
+    replace:
+      dest: /etc/httpd/conf.d/virtualhost.conf
+      regexp: 'yourdomain.com'
+      replace: "{{ yourdomain }}"
+    notify:
+      - restart httpd service
+
+  - name: Update php.ini
+    lineinfile:
+      dest: /etc/php.ini
+      regexp: '^expose_php'
+      line: 'expose_php = Off'
+#    become: true
